@@ -43,19 +43,19 @@ func createProject(cmd *cobra.Command, args []string) {
 	fmt.Print("What's your app name? ")
 	appName, _ := reader.ReadString('\n')
 	appName = strings.TrimSpace(appName)
-
+	fmt.Println("Available services include mysql, pgsql, mariadb, redis, memcached, meilisearch, typesense, minio, selenium, and mailpit")
 	fmt.Print("What are the services do you want to use? (separated by space) ")
 	text, _ := reader.ReadString('\n')
 	services := strings.ReplaceAll(text, " ", ",")
 
-	curlCmd := fmt.Sprintf("curl -s \"https://laravel.build/%s?with=%s\" | bash",
-		appName, services)
+	exit := exec.Command("curl", fmt.Sprintf("https://laravel.build/%s?with=%s |bash", appName, services))
 
-	// Executar o comando curl
-	output, err := exec.Command("bash", "-c", curlCmd).Output()
+	// Executar o comando e capturar a saída
+	output, err := exit.CombinedOutput()
 	if err != nil {
-		fmt.Println(err)
-		return
+		fmt.Println("Erro ao executar comando:", err)
+		fmt.Println(string(output)) // Imprimir a saída para depuração
+	} else {
+		fmt.Println(string(output))
 	}
-	fmt.Println(string(output))
 }
